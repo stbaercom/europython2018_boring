@@ -1,6 +1,11 @@
-
-
 import pandas as pd
+import pptx
+
+from pptx.chart.data import ChartData
+from pptx.enum.chart import XL_CHART_TYPE
+from pptx.util import Inches
+from pd2ppt import df_to_table
+
 
 def load_excel_files():
     df_times = pd.read_excel("input_data/project_hours.xlsx")
@@ -8,24 +13,22 @@ def load_excel_files():
     df_rates = pd.read_excel("input_data/project_rates.xlsx")
     return df_times, df_expenses, df_rates
 
-def transform_excel(df_times, df_expenses, df_rates):
-    import pandas as pd
 
+def transform_excel(df_times, df_expenses, df_rates):
     df_times_rate = df_times.merge(df_rates, how="outer", on="Person")
     times_diff = df_times_rate["TimeStop"] - df_times_rate["TimeStart"]
     df_times_rate["Cost"] = times_diff * df_times_rate["Rate"]
     df_times_cost_pivot = df_times_rate.pivot_table(
-        values="Cost",index=["Project", "Person"]).reset_index()
+        values="Cost", index=["Project", "Person"]).reset_index()
     df_times_cost_pivot["Cost Type"] = "hours"
     df_expenses_pivot = df_expenses.pivot_table(
-        values="Cost",index=["Project", "Person"]).reset_index()
+        values="Cost", index=["Project", "Person"]).reset_index()
     df_expenses_pivot["Cost Type"] = "expenses"
     df_all_costs = pd.concat([df_expenses_pivot, df_times_cost_pivot], sort=True)
     return df_times_cost_pivot, df_expenses_pivot, df_all_costs
 
 
 def create_introsheet(workbook):
-
     introsheet = workbook.add_worksheet("Introduction")
     bold = workbook.add_format(
         {'bold': True, "align": "right", "font_color": "blue"})
@@ -36,9 +39,8 @@ def create_introsheet(workbook):
     introsheet.insert_image(1, 0, "input_data/logo.jpg",
                             {'x_scale': 0.5, 'y_scale': 0.5})
 
-def export_to_xlsx_sheets(df_times_cost_pivot, df_expenses_pivot, df_all_costs):
-    import pandas as pd
 
+def export_to_xlsx_sheets(df_times_cost_pivot, df_expenses_pivot, df_all_costs):
     writer = pd.ExcelWriter('scrap_data/pandas_simple.xlsx')
     df_all_costs.to_excel(writer, index=False, sheet_name='df_all_costs')
     df_expenses_pivot.to_excel(writer, index=False, sheet_name='df_expenses_pivot')
@@ -46,11 +48,7 @@ def export_to_xlsx_sheets(df_times_cost_pivot, df_expenses_pivot, df_all_costs):
     writer.close()
 
 
-
 def create_sheets_from_pandas_intro(df_times_cost_pivot, df_expenses_pivot, df_all_costs):
-    import pandas as pd
-
-
     writer = pd.ExcelWriter('scrap_data/pandas_simple_intro.xlsx',
                             engine='xlsxwriter')
     workbook = writer.book
@@ -64,7 +62,6 @@ def create_sheets_from_pandas_intro(df_times_cost_pivot, df_expenses_pivot, df_a
 
 
 def create_pandas_by_hand_1(workbook, sheet_title, dataframe):
-
     sheet = workbook.add_worksheet(sheet_title)
     sheet.write_row(0, 0, dataframe.columns)
     for i, row in enumerate(dataframe.values):
@@ -72,7 +69,6 @@ def create_pandas_by_hand_1(workbook, sheet_title, dataframe):
 
 
 def create_pandas_by_hand_2(workbook, sheet_title, dataframe):
-
     sheet = workbook.add_worksheet(sheet_title)
     large_text = workbook.add_format({'bold': True, "font_size": 14})
     red_bold = workbook.add_format({'bold': True, "font_color": "red"})
@@ -94,7 +90,6 @@ def create_pandas_by_hand_2(workbook, sheet_title, dataframe):
 
 
 def create_pandas_by_hand_3(workbook, sheet_title, dataframe):
-
     num_format = workbook.add_format({'num_format': "####.#"})
     sheet = workbook.add_worksheet(sheet_title)
     nrows, ncols = dataframe.shape
@@ -112,12 +107,10 @@ def create_pandas_by_hand_3(workbook, sheet_title, dataframe):
     sheet.conditional_format(1, 0, nrows, 0, conditional_options)
 
 
-
 def create_chart_1(workbook, sheet_title, df_all_costs):
-
     sheet = workbook.add_worksheet(sheet_title)
     df_chart = df_all_costs.pivot_table(
-        values="Cost", index="Person",columns="Cost Type")
+        values="Cost", index="Person", columns="Cost Type")
     df_chart.reset_index(inplace=True)
     sheet.write_row(0, 0, [s.upper() for s in df_chart.columns])
     sheet.write_column(1, 0, df_chart['Person'])
@@ -135,7 +128,6 @@ def create_chart_1(workbook, sheet_title, df_all_costs):
 
 
 def prepare_excel_xlsxwriter(df_all_costs, df_expenses_pivot, df_times_cost_pivot):
-    import pandas as pd
     export_to_xlsx_sheets(df_times_cost_pivot, df_expenses_pivot, df_all_costs)
     create_sheets_from_pandas_intro(df_times_cost_pivot, df_expenses_pivot, df_all_costs)
     writer = pd.ExcelWriter('scrap_data/pandas_complex.xlsx', engine='xlsxwriter')
@@ -156,8 +148,6 @@ def create_slide(presentation, title, layout=5):
 
 
 def prepare_pptx(df_all_costs):
-    import pptx
-
     create_presentation_1()
 
     presentation = pptx.Presentation("input_data/template.pptx")
@@ -176,7 +166,6 @@ def prepare_pptx(df_all_costs):
 
 
 def prepare_pptx_and_convert(df_all_costs, pptx_filename, export_format="pdf"):
-
     import os
     import subprocess
     import pptx
@@ -194,7 +183,6 @@ def prepare_pptx_and_convert(df_all_costs, pptx_filename, export_format="pdf"):
 
 
 def combine_pdf(pptx_filename):
-
     import pdfrw
     pdf_filename = pptx_filename.replace(".pptx", ".pdf")
     pdf_report_pages = pdfrw.PdfReader(pdf_filename).pages
@@ -207,11 +195,6 @@ def combine_pdf(pptx_filename):
 
 
 def create_chart_slide(df_all_costs, slide):
-
-    from pptx.chart.data import ChartData
-    from pptx.enum.chart import XL_CHART_TYPE
-    from pptx.util import Inches
-
     df_chart = df_all_costs.pivot_table(values="Cost",
                                         index="Person", columns="Cost Type")
     df_chart.reset_index(inplace=True)
@@ -220,8 +203,10 @@ def create_chart_slide(df_all_costs, slide):
     chart_data.add_series('Expenses', list(df_chart["expenses"]))
     chart_data.add_series('Hours', list(df_chart["hours"]))
     CHART_TYPE = XL_CHART_TYPE.COLUMN_CLUSTERED
-    chart_left = Inches(1); chart_top = Inches(2)
-    chart_width = Inches(12); chart_height = Inches(4)
+    chart_left = Inches(1);
+    chart_top = Inches(2)
+    chart_width = Inches(12);
+    chart_height = Inches(4)
     chart = slide.shapes.add_chart(CHART_TYPE, chart_left, chart_top,
                                    chart_width, chart_height, chart_data).chart
     chart.has_legend = True
@@ -229,18 +214,15 @@ def create_chart_slide(df_all_costs, slide):
 
 
 def create_table_slide(df_all_costs, slide):
-
-    from pd2ppt import df_to_table
-    from pptx.util import Inches
-    table_left = Inches(1); table_top = Inches(2)
-    table_width = Inches(12); table_height = Inches(4)
+    table_left = Inches(1);
+    table_top = Inches(2)
+    table_width = Inches(12);
+    table_height = Inches(4)
     df_to_table(slide, df_all_costs, table_left, table_top,
                 table_width, table_height)
 
 
 def create_intro_slide_with_graphic(slide):
-
-    from pptx.util import Inches
     left = width = height = Inches(1)
     top = Inches(2)
     txBox = slide.shapes.add_textbox(left, top, width, height)
@@ -251,17 +233,13 @@ def create_intro_slide_with_graphic(slide):
 
 
 def create_presentation_1():
-
-    import pptx
     presentation = pptx.Presentation("input_data/template.pptx")
     title_slide_layout = presentation.slide_layouts[0]
     slide = presentation.slides.add_slide(title_slide_layout)
     title = slide.shapes.title
     title.text = "Meaningful Title"
-
     subtitle = slide.placeholders[1]
     subtitle.text = "Some text for the placeholder defined in the layout"
-
     presentation.save("./output_data/presentation_1.pptx")
 
 
@@ -269,10 +247,6 @@ def prepare_pdf(df_all_costs):
     pptx_filename = './output_data/plain.pptx'
     prepare_pptx_and_convert(df_all_costs, pptx_filename)
     combine_pdf(pptx_filename)
-
-
-def prepare_docx():
-    pass
 
 
 def main():
@@ -285,15 +259,12 @@ def main():
     # Create the different versions of Excel file, in increasing order of colorfulness...
     prepare_excel_xlsxwriter(df_all_costs, df_expenses_pivot, df_times_cost_pivot)
 
-
     # Prepare a PPTX, based on the pivots and an existing PPTX 'template'
     prepare_pptx(df_all_costs)
 
     # Finally, create a version of the PPTX to turn into a PDF via Libreoffice, and process the resulting file
     # with Python
     prepare_pdf(df_all_costs)
-
-
 
 
 if __name__ == '__main__':
