@@ -1,9 +1,15 @@
-import pandas as pd
-import pptx
+import os
+import subprocess
 
+import pandas as pd
+
+import pptx
 from pptx.chart.data import ChartData
 from pptx.enum.chart import XL_CHART_TYPE
 from pptx.util import Inches
+
+import pdfrw
+
 from pd2ppt import df_to_table
 
 
@@ -166,9 +172,6 @@ def prepare_pptx(df_all_costs):
 
 
 def prepare_pptx_and_convert(df_all_costs, pptx_filename, export_format="pdf"):
-    import os
-    import subprocess
-    import pptx
 
     presentation_plain = pptx.Presentation("input_data/template_plain.pptx")
     slide = create_slide(presentation_plain, "Charts")
@@ -183,7 +186,6 @@ def prepare_pptx_and_convert(df_all_costs, pptx_filename, export_format="pdf"):
 
 
 def combine_pdf(pptx_filename):
-    import pdfrw
     pdf_filename = pptx_filename.replace(".pptx", ".pdf")
     pdf_report_pages = pdfrw.PdfReader(pdf_filename).pages
     pdf_template_pages = pdfrw.PdfReader('input_data/pdf_template.pdf').pages

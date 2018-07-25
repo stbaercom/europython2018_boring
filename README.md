@@ -1,4 +1,4 @@
-This is the sample code for the Europython talk: "The Boring Python Office Talk". It shows how to do some basic operations with 
+This is the sample code for the Europython talk: "The Boring Python Office Talk". It shows how to do some basic operations with office formats like XLSX, PPTX, PDF, and of course, Python
 
 You will need to install LibreOffice/OpenOffice.org and adjust the path to the soffice binary in code (prepare_pptx_and_convert) in order to make the PPTX to PDF conversation work. 
 
