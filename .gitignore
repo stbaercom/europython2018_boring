@@ -103,3 +103,11 @@ venv.bak/
 # mypy
 .mypy_cache/
 .DS_Store
+/.idea/misc.xml
+/.idea/modules.xml
+/.idea/vcs.xml
+/.idea/workspace.xml
+/pd2ppt.py
+/.idea
+/output_data
+/scrap_data

@@ -5,7 +5,6 @@ import pandas as pd
 def load_excel_files():
     df_times = pd.read_excel("input_data/project_hours.xlsx")
     df_expenses = pd.read_excel("input_data/project_expenses.xlsx")
-    df_expenses.rename({"Amount": "Cost"}, axis="columns", inplace=True)
     df_rates = pd.read_excel("input_data/project_rates.xlsx")
     return df_times, df_expenses, df_rates
 
@@ -144,7 +143,7 @@ def prepare_excel_xlsxwriter(df_all_costs, df_expenses_pivot, df_times_cost_pivo
     create_pandas_by_hand_1(workbook, "All Costs", df_all_costs)
     create_pandas_by_hand_2(workbook, "All Costs 2", df_all_costs)
     create_pandas_by_hand_3(workbook, "All Costs 3", df_all_costs)
-    create_chart_1(workbook, "Sheet with Chart 1", df_all_costs, False)
+    create_chart_1(workbook, "Sheet with Chart 1", df_all_costs)
 
 
 def create_slide(presentation, title, layout=5):
@@ -231,7 +230,7 @@ def create_chart_slide(df_all_costs, slide):
 
 def create_table_slide(df_all_costs, slide):
 
-    from PandasToPowerpoint import df_to_table
+    from pd2ppt import df_to_table
     from pptx.util import Inches
     table_left = Inches(1); table_top = Inches(2)
     table_width = Inches(12); table_height = Inches(4)
@@ -295,8 +294,6 @@ def main():
     prepare_pdf(df_all_costs)
 
 
-    # TODO
-    prepare_docx()
 
 
 if __name__ == '__main__':
