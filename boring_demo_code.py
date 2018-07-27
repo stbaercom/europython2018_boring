@@ -1,7 +1,6 @@
 import os
 import subprocess
 
-import pandas as pd
 
 import pptx
 from pptx.chart.data import ChartData
@@ -11,6 +10,8 @@ from pptx.util import Inches
 import pdfrw
 
 from pd2ppt import df_to_table
+
+import pandas as pd
 
 
 def load_excel_files():
@@ -30,7 +31,7 @@ def transform_excel(df_times, df_expenses, df_rates):
     df_expenses_pivot = df_expenses.pivot_table(
         values="Cost", index=["Project", "Person"]).reset_index()
     df_expenses_pivot["Cost Type"] = "expenses"
-    df_all_costs = pd.concat([df_expenses_pivot, df_times_cost_pivot], sort=True)
+    df_all_costs = pd.concat([df_expenses_pivot, df_times_cost_pivot], sort=False)
     return df_times_cost_pivot, df_expenses_pivot, df_all_costs
 
 
